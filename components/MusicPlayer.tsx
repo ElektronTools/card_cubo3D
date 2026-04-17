@@ -31,15 +31,7 @@ export default function MusicPlayer({
   return (
     <div className="glass-panel rounded-[1.75rem] p-4 sm:rounded-[2.1rem] sm:p-6">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-2">
-          <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-rose-500 sm:text-sm sm:tracking-[0.24em]">Nuestra cancion</p>
-          <h3 className="text-xl font-semibold sm:text-2xl">Un fondo musical para este comienzo</h3>
-          <p className="max-w-2xl text-slate-600">
-            {autoplayBlocked
-              ? 'En algunos moviles el navegador bloquea el sonido automatico. Toca reproducir y se activara.'
-              : 'La pagina intenta reproducirla apenas se abre para acompanar el momento desde el inicio.'}
-          </p>
-        </div>
+
 
         <div className="mx-auto w-full flex flex-col gap-4 rounded-[1.6rem] border border-white/70 bg-gradient-to-br from-white/80 to-rose-50/70 p-4 shadow-md lg:max-w-[420px]">
           <div className="relative mb-4 h-32 w-full overflow-hidden rounded-[1.3rem] border border-white/50 shadow-lg sm:h-40">
@@ -65,7 +57,7 @@ export default function MusicPlayer({
 
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-slate-800">Risa</p>
-              <p className="text-sm text-slate-600">Un detalle para ti</p>
+              <p className="text-sm text-slate-600">Babasónicos</p>
             </div>
           </div>
 
