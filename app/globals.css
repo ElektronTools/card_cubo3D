@@ -186,40 +186,40 @@ button {
   }
 
   .cube-wrapper {
-    width: 160px;
-    height: 160px;
+    width: 250px;
+    height: 250px;
   }
 
   .face {
-    width: 160px;
-    height: 160px;
-    padding: 0.9rem;
-    border-radius: 1.15rem;
-    font-size: 0.62rem;
+    width: 250px;
+    height: 250px;
+    padding: 1.2rem;
+    border-radius: 1.5rem;
+    font-size: 0.7rem;
   }
 
   .face-1 {
-    transform: translateZ(80px);
+    transform: translateZ(125px);
   }
 
   .face-2 {
-    transform: rotateY(180deg) translateZ(80px);
+    transform: rotateY(180deg) translateZ(125px);
   }
 
   .face-3 {
-    transform: rotateY(-90deg) translateZ(80px);
+    transform: rotateY(-90deg) translateZ(125px);
   }
 
   .face-4 {
-    transform: rotateY(90deg) translateZ(80px);
+    transform: rotateY(90deg) translateZ(125px);
   }
 
   .face-5 {
-    transform: rotateX(90deg) translateZ(80px);
+    transform: rotateX(90deg) translateZ(125px);
   }
 
   .face-6 {
-    transform: rotateX(-90deg) translateZ(80px);
+    transform: rotateX(-90deg) translateZ(125px);
   }
 }
 

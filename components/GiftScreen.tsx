@@ -65,11 +65,11 @@ export default function GiftScreen({
   }
 
   return (
-    <div className="relative w-full space-y-4 sm:space-y-6">
+    <div className="relative w-full h-full min-h-[100dvh] flex flex-col">
       {floatingHearts.map((heart) => (
         <span
           key={heart.id}
-          className="floating-heart-up absolute text-2xl text-rose-300/70 sm:text-3xl"
+          className="floating-heart-up fixed text-2xl text-rose-300/70 sm:text-3xl"
           style={{
             left: `${heart.left}%`,
             bottom: '0',
@@ -78,35 +78,29 @@ export default function GiftScreen({
           ❤
         </span>
       ))}
-      <div className="mx-auto w-full max-w-6xl space-y-4 sm:space-y-6">
-
-      <div className="glass-panel rounded-[1.8rem] p-4 shadow-[0_30px_120px_rgba(126,34,79,0.22)] sm:rounded-[2.25rem] sm:p-8 lg:p-10">
-        <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-white/70 bg-[linear-gradient(145deg,rgba(255,255,255,0.8),rgba(255,241,242,0.68))] p-4 shadow-[0_16px_70px_rgba(244,114,182,0.18)] sm:rounded-[2rem] sm:p-5">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.65),_transparent_50%)]" />
-            <div className="relative">
-              <Cube3D />
-            </div>
-          </div>
+      
+      <div className="relative flex-1 overflow-hidden rounded-b-[1.8rem] sm:rounded-b-[2rem] p-2 sm:p-4">
+        <div className="relative h-full w-full flex items-center justify-center">
+          <Cube3D />
         </div>
-        
       </div>
 
-      <MusicPlayer
-        autoplayBlocked={autoplayBlocked}
-        currentTime={currentTime}
-        duration={duration}
-        isPlaying={isPlaying}
-        onSeek={onSeek}
-        onTogglePlayback={handlePlayClick}
-      />
-      <button
-        type="button"
-        onPointerUp={onReturn}
-        className="relative z-30 mx-auto block touch-manipulation rounded-full border border-rose-200 bg-white/80 px-5 py-3 text-sm font-semibold text-rose-500 transition hover:border-rose-300 hover:bg-white sm:w-auto"
-       >
-        ← Volver al inicio
-      </button>
+      <div className="w-full px-2 py-2 sm:px-6 sm:py-6">
+        <MusicPlayer
+          autoplayBlocked={autoplayBlocked}
+          currentTime={currentTime}
+          duration={duration}
+          isPlaying={isPlaying}
+          onSeek={onSeek}
+          onTogglePlayback={handlePlayClick}
+        />
+        <button
+          type="button"
+          onPointerUp={onReturn}
+          className="relative z-30 mx-auto block mt-2 touch-manipulation rounded-full border border-rose-200 bg-white/80 px-4 py-2 text-xs font-semibold text-rose-500 transition hover:border-rose-300 hover:bg-white sm:mt-4 sm:px-5 sm:py-3 sm:text-sm sm:w-auto"
+         >
+          ← Volver al inicio
+        </button>
       </div>
     </div>
   )
