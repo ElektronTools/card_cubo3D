@@ -65,7 +65,7 @@ export default function AcceptScreen({ onNext }: { onNext: () => void }) {
         <button
           type="button"
           onPointerUp={handleOpenDetail}
-          className="relative z-30 w-full touch-manipulation rounded-full bg-[linear-gradient(135deg,#be185d,#ec4899,#fb7185)] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_50px_rgba(190,24,93,0.35)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(190,24,93,0.42)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-300/60 sm:w-auto sm:px-8 sm:text-lg"
+          className="relative z-30 w-full touch-manipulation rounded-full bg-gradient-to-r from-pink-500 via-rose-400 to-pink-400 px-6 py-4 text-base font-bold text-white shadow-[0_8px_32px_rgba(236,72,153,0.4),0_0_0_2px_rgba(255,255,255,0.2)_inset] transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(236,72,153,0.5),0_0_0_2px_rgba(255,255,255,0.3)_inset] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/80 sm:w-auto sm:px-8 sm:text-lg"
         >
           Abrir este detalle para ti
         </button>

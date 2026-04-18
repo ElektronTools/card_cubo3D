@@ -79,7 +79,10 @@ export default function GiftScreen({
         </span>
       ))}
       
-      <div className="relative flex-1 overflow-hidden rounded-b-[1.8rem] sm:rounded-b-[2rem] p-2 sm:p-4">
+      <div className="relative flex-1 overflow-hidden rounded-b-[1.8rem] sm:rounded-b-[2rem] p-2 sm:p-4 flex flex-col items-center justify-center gap-4 sm:gap-6">
+        <h2 className="text-center text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] drop-shadow-[0_0_20px_rgba(255,192,203,0.5)] tracking-wide letter-spacing-2">
+          With love for Adriana
+        </h2>
         <div className="relative h-full w-full flex items-center justify-center">
           <Cube3D />
         </div>
@@ -97,11 +100,15 @@ export default function GiftScreen({
         <button
           type="button"
           onPointerUp={onReturn}
-          className="relative z-30 mx-auto block mt-2 touch-manipulation rounded-full border border-rose-200 bg-transparent px-4 py-2 text-xs font-semibold text-rose-500 transition hover:border-rose-300 hover:bg-transparent sm:mt-4 sm:px-5 sm:py-3 sm:text-sm sm:w-auto"
+          className="relative z-30 mx-auto block mt-2 touch-manipulation rounded-full border-2 border-white bg-white/30 backdrop-blur-sm px-4 py-2 text-xs font-bold text-white transition hover:bg-white/40 hover:border-white shadow-[0_4px_16px_rgba(0,0,0,0.1)] sm:mt-4 sm:px-5 sm:py-3 sm:text-sm sm:w-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
          >
           ← Volver al inicio
         </button>
       </div>
+
+      <footer className="w-full py-3 sm:py-4 text-center">
+        <p className="text-white/80 text-xs sm:text-sm font-medium drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">Made with 💖 by devLAAT🚀</p>
+      </footer>
     </div>
   )
 }

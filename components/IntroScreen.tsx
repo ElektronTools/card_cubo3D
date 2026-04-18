@@ -40,7 +40,7 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
             <button
               type="button"
               onPointerUp={onYes}
-              className="relative z-30 w-full touch-manipulation rounded-full bg-[linear-gradient(135deg,#e11d48,#fb7185,#f59e0b)] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_45px_rgba(225,29,72,0.35)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_60px_rgba(225,29,72,0.42)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-300/60 sm:w-auto sm:px-8 sm:text-lg"
+              className="relative z-30 w-full touch-manipulation rounded-full bg-gradient-to-r from-rose-500 to-pink-400 px-6 py-4 text-base font-semibold text-white shadow-[0_8px_32px_rgba(244,63,94,0.4),0_0_0_2px_rgba(255,255,255,0.2)_inset] transition duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(244,63,94,0.5),0_0_0_2px_rgba(255,255,255,0.3)_inset] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/80 sm:w-auto sm:px-8 sm:text-lg font-bold"
             >
               Si
             </button>
@@ -49,7 +49,7 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
               type="button"
               onMouseEnter={advanceNoButton}
               onClick={advanceNoButton}
-              className={`relative z-30 w-full touch-manipulation rounded-full border border-rose-200 bg-transparent px-6 py-4 text-sm font-medium text-rose-500 shadow-sm transition duration-300 hover:border-rose-300 hover:bg-transparent sm:w-auto sm:px-7 sm:text-base ${buttonOffsets[teaseLevel]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-200`}
+              className={`relative z-30 w-full touch-manipulation rounded-full border-2 border-white bg-white/30 backdrop-blur-sm px-6 py-4 text-sm font-bold text-white shadow-[0_4px_16px_rgba(0,0,0,0.1)] transition duration-300 hover:bg-white/40 hover:border-white sm:w-auto sm:px-7 sm:text-base ${buttonOffsets[teaseLevel]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/60`}
             >
               {noLabels[teaseLevel]}
             </button>

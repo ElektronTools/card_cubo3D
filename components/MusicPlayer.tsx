@@ -48,7 +48,7 @@ export default function MusicPlayer({
             <button
               type="button"
               onPointerUp={() => void onTogglePlayback()}
-              className="relative z-30 flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 touch-manipulation items-center justify-center rounded-full bg-white text-sm sm:text-base text-rose-600 transition hover:scale-110 hover:bg-rose-50 font-bold"
+              className="relative z-30 flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 touch-manipulation items-center justify-center rounded-full bg-white text-sm sm:text-base text-rose-500 transition hover:scale-110 hover:bg-rose-50 hover:shadow-lg font-bold shadow-md"
               aria-label={isPlaying ? 'Pausar cancion' : 'Reproducir cancion'}
             >
               {isPlaying ? '❚❚' : '▶'}
