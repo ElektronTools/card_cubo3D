@@ -49,9 +49,9 @@ export default function AcceptScreen({ onNext }: { onNext: () => void }) {
   }
 
   return (
-    <div className="mx-auto glass-panel w-full max-w-4xl rounded-[1.75rem] p-4 text-center shadow-[0_30px_100px_rgba(157,23,77,0.2)] sm:rounded-[2.25rem] sm:p-10">
+    <div className="mx-auto w-full max-w-4xl rounded-[1.75rem] p-4 text-center sm:rounded-[2.25rem] sm:p-10 bg-white/20 backdrop-blur-sm">
       <div className="mx-auto max-w-3xl space-y-6">
-        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/80 text-3xl shadow-lg shadow-rose-200/50 sm:h-20 sm:w-20 sm:text-4xl">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-transparent text-3xl shadow-lg shadow-rose-200/50 sm:h-20 sm:w-20 sm:text-4xl">
           💖
         </div>
 

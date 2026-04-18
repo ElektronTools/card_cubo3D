@@ -97,7 +97,7 @@ export default function GiftScreen({
         <button
           type="button"
           onPointerUp={onReturn}
-          className="relative z-30 mx-auto block mt-2 touch-manipulation rounded-full border border-rose-200 bg-white/80 px-4 py-2 text-xs font-semibold text-rose-500 transition hover:border-rose-300 hover:bg-white sm:mt-4 sm:px-5 sm:py-3 sm:text-sm sm:w-auto"
+          className="relative z-30 mx-auto block mt-2 touch-manipulation rounded-full border border-rose-200 bg-transparent px-4 py-2 text-xs font-semibold text-rose-500 transition hover:border-rose-300 hover:bg-transparent sm:mt-4 sm:px-5 sm:py-3 sm:text-sm sm:w-auto"
          >
           ← Volver al inicio
         </button>

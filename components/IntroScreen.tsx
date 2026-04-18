@@ -11,11 +11,11 @@ const buttonOffsets = [
 ]
 
 const playfulMessages = [
-  'Prometo hacer esta historia muy bonita.',
+  'No 💔',
+  'Piénsalo otra vez 😢',
   'Ese boton se puso nervioso.',
-  'Creo que el universo ya eligio su respuesta.',
   'Miralo bien... quiere que digas que si.',
-  'Te juro que vale la pena intentarlo juntos.',
+  'Última oportunidad 😳',
 ]
 
 const noLabels = ['No', 'Segura?', 'Piensalo', 'Ay no', 'Mejor si']
@@ -28,7 +28,7 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
   }
 
   return (
-    <div className="mx-auto glass-panel w-full max-w-5xl overflow-hidden rounded-[1.75rem] p-4 shadow-[0_30px_100px_rgba(126,34,79,0.25)] sm:rounded-[2rem] sm:p-8 lg:p-10">
+    <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-[1.75rem] p-4 sm:rounded-[2rem] sm:p-8 lg:p-10 bg-white/20 backdrop-blur-sm">
       <div className="grid items-center gap-6 sm:gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6 text-center lg:text-left">
           <div className="space-y-4">
@@ -49,7 +49,7 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
               type="button"
               onMouseEnter={advanceNoButton}
               onClick={advanceNoButton}
-              className={`relative z-30 w-full touch-manipulation rounded-full border border-rose-200 bg-white/80 px-6 py-4 text-sm font-medium text-rose-500 shadow-sm transition duration-300 hover:border-rose-300 hover:bg-white sm:w-auto sm:px-7 sm:text-base ${buttonOffsets[teaseLevel]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-200`}
+              className={`relative z-30 w-full touch-manipulation rounded-full border border-rose-200 bg-transparent px-6 py-4 text-sm font-medium text-rose-500 shadow-sm transition duration-300 hover:border-rose-300 hover:bg-transparent sm:w-auto sm:px-7 sm:text-base ${buttonOffsets[teaseLevel]} focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-rose-200`}
             >
               {noLabels[teaseLevel]}
             </button>

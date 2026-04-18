@@ -133,7 +133,7 @@ export default function Page() {
   }
 
   return (
-    <main className="relative min-h-[100dvh] overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.92),_rgba(255,228,236,0.88)_35%,_rgba(255,214,224,0.76)_62%,_rgba(168,85,247,0.18)_100%)] text-slate-900">
+    <main className="relative min-h-[100dvh] overflow-hidden bg-[url('/img/fondo.jpeg')] bg-cover bg-center bg-fixed text-slate-900">
       <audio ref={audioRef} preload="auto" src="/music/risa.mp3" />
 
       <div className="pointer-events-none absolute inset-0 opacity-80">

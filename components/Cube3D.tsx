@@ -7,9 +7,9 @@ const faces = [
   { src: '/img/image1.png', alt: 'Recuerdo 1', label: 'Pure love' },
   { src: '/img/image2.jpg', alt: 'Recuerdo 2', label: 'Lukass' },
   { src: '/img/image3.jpg', alt: 'Recuerdo 3', label: 'Thorfinn' },
-  { src: '/img/image4.jpg', alt: 'Recuerdo 4', label: 'Tu mirada' },
+  { src: '/img/image4.jpg', alt: 'Recuerdo 4', label: 'Cloti' },
   { src: '/img/image5.jpg', alt: 'Recuerdo 5', label: 'Las wawas' },
-  { src: '/img/image6.jpg', alt: 'Recuerdo 6', label: 'Luu' },
+  { src: '/img/image6.jpg', alt: 'Recuerdo 6', label: 'Con el Luu💖' },
 ]
 
 const getImageUrl = (src: string) => {
