@@ -21,11 +21,6 @@ export default function AcceptScreen({ onNext }: { onNext: () => void }) {
   const starsRef = useRef<{ left: number; top: number; size: number; dur: number; delay: number; op: number }[]>([])
   const counterRef = useRef(0)
 
-  const moments = [
-    'Celebrar cada sí como si fuera un pequeño milagro.',
-    'Convertir los días normales en recuerdos favoritos.',
-    'Guardar este instante como el primer capítulo.',
-  ]
 
   useEffect(() => {
     starsRef.current = Array.from({ length: 50 }, () => ({
@@ -39,15 +34,7 @@ export default function AcceptScreen({ onNext }: { onNext: () => void }) {
     setMounted(true)
   }, [])
 
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setVisibleCount((c) => {
-        if (c >= moments.length) { window.clearInterval(interval); return c }
-        return c + 1
-      })
-    }, 500)
-    return () => window.clearInterval(interval)
-  }, [])
+
 
   const spawnHearts = () => {
     const newHearts: FloatingHeart[] = Array.from({ length: 22 }, (_, i) => ({

@@ -21,10 +21,16 @@ const playfulMessages = [
 
 const noLabels = ['No', 'Segura?', 'Piénsalo', 'Ay no', 'Mejor sí']
 
+const noScales = [1, 0.88, 0.76, 0.62, 0.48]
+
+type Star = { left: number; top: number; size: number; dur: number; delay: number; op: number }
+
 export default function IntroScreen({ onYes }: { onYes: () => void }) {
   const [teaseLevel, setTeaseLevel] = useState(0)
+  const [noVisible, setNoVisible] = useState(true)
+  const [teaseKey, setTeaseKey] = useState(0)
   const [mounted, setMounted] = useState(false)
-  const starsRef = useRef<{ left: number; top: number; size: number; dur: number; delay: number; op: number }[]>([])
+  const starsRef = useRef<Star[]>([])
 
   useEffect(() => {
     starsRef.current = Array.from({ length: 50 }, () => ({
@@ -39,8 +45,19 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
   }, [])
 
   const advanceNoButton = () => {
-    setTeaseLevel((c) => Math.min(c + 1, buttonOffsets.length - 1))
+    setTeaseLevel((prev) => {
+      const next = Math.min(prev + 1, noLabels.length - 1)
+      if (next === noLabels.length - 1) {
+        setTimeout(() => setNoVisible(false), 900)
+      }
+      return next
+    })
+    setTeaseKey((k) => k + 1)
   }
+
+  const currentScale = noScales[Math.min(teaseLevel, noScales.length - 1)]
+  const currentOffset = buttonOffsets[Math.min(teaseLevel, buttonOffsets.length - 1)]
+  const currentMessage = playfulMessages[Math.min(teaseLevel, playfulMessages.length - 1)]
 
   return (
     <>
@@ -60,7 +77,6 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           border: 0.5px solid rgba(255, 160, 180, 0.18);
           padding: 2.5rem 1.5rem;
         }
-
         @media (min-width: 640px) {
           .intro-root { padding: 3.5rem 3rem; border-radius: 2.25rem; }
         }
@@ -68,7 +84,6 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           .intro-root { padding: 4rem 3.5rem; }
         }
 
-        /* Orbes internos */
         .intro-orb {
           position: absolute;
           border-radius: 50%;
@@ -92,7 +107,6 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           to   { opacity: 1;   transform: scale(1.2); }
         }
 
-        /* Estrellas */
         .intro-star {
           position: absolute;
           background: white;
@@ -107,7 +121,6 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           50%       { opacity: var(--op); }
         }
 
-        /* Contenido */
         .intro-inner {
           position: relative;
           z-index: 2;
@@ -122,24 +135,6 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
         .intro-left { text-align: center; }
         @media (min-width: 1024px) { .intro-left { text-align: left; } }
 
-        /* Badge */
-        .intro-badge {
-          display: inline-block;
-          font-family: 'Lato', sans-serif;
-          font-weight: 300;
-          font-size: 10px;
-          letter-spacing: 5px;
-          text-transform: uppercase;
-          color: rgba(255, 185, 170, 0.65);
-          border: 0.5px solid rgba(220, 110, 130, 0.3);
-          padding: 5px 20px;
-          border-radius: 100px;
-          background: rgba(210, 70, 110, 0.08);
-          margin-bottom: 1.2rem;
-          animation: intro-fade-up 0.8s ease both 0.1s;
-        }
-
-        /* Título */
         .intro-title {
           font-family: 'Cinzel', serif;
           font-weight: 600;
@@ -158,7 +153,6 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           to   { filter: drop-shadow(0 0 32px rgba(255,170,200,0.75)); }
         }
 
-        /* Divisor */
         .intro-divider {
           display: flex;
           align-items: center;
@@ -186,13 +180,16 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           75% { transform: scale(1.2); }
         }
 
-        /* Botones */
+        .intro-btns-wrap {
+          animation: intro-fade-up 0.8s ease both 0.6s;
+          min-height: 64px;
+        }
+
         .intro-btns {
           display: flex;
           flex-direction: column;
           align-items: stretch;
           gap: 0.75rem;
-          animation: intro-fade-up 0.8s ease both 0.6s;
         }
         @media (min-width: 640px) {
           .intro-btns {
@@ -210,13 +207,13 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           z-index: 30;
           font-family: 'Cinzel', serif;
           font-weight: 600;
-          font-size: 1rem;
-          letter-spacing: 2px;
+          font-size: 1.15rem;
+          letter-spacing: 3px;
           color: white;
           background: linear-gradient(135deg, #d94f7a, #c44fbe);
           border: none;
           border-radius: 100px;
-          padding: 14px 40px;
+          padding: 18px 52px;
           cursor: pointer;
           touch-action: manipulation;
           -webkit-tap-highlight-color: transparent;
@@ -229,25 +226,35 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
         }
         .btn-yes:active { transform: scale(0.97); }
 
-        .btn-no {
+        .btn-no-wrapper {
           position: relative;
           z-index: 30;
+          transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.55s ease;
+          transform-origin: center;
+        }
+        .btn-no-wrapper.hiding {
+          opacity: 0 !important;
+          transform: scale(0.1) !important;
+          pointer-events: none;
+        }
+
+        .btn-no {
           font-family: 'Lato', sans-serif;
           font-weight: 300;
-          font-size: 0.85rem;
           letter-spacing: 3px;
           text-transform: uppercase;
           color: rgba(255,200,190,0.7);
           background: rgba(255,255,255,0.05);
           border: 0.5px solid rgba(255,160,180,0.22);
           border-radius: 100px;
-          padding: 12px 28px;
           cursor: pointer;
           touch-action: manipulation;
           -webkit-tap-highlight-color: transparent;
           backdrop-filter: blur(8px);
-          transition: background 0.3s, color 0.3s, border-color 0.3s, transform 0.25s;
+          transition: background 0.3s, color 0.3s, border-color 0.3s, font-size 0.4s ease, padding 0.4s ease;
           white-space: nowrap;
+          display: block;
+          width: 100%;
         }
         .btn-no:hover {
           background: rgba(80,20,40,0.25);
@@ -255,21 +262,26 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
           border-color: rgba(200,80,110,0.4);
         }
 
-        /* Mensaje tease */
-        .intro-tease {
-          min-height: 1.6rem;
+        .intro-tease-wrap {
+          min-height: 2rem;
           margin-top: 1rem;
+          animation: intro-fade-up 0.8s ease both 0.75s;
+        }
+        .intro-tease {
           font-family: 'Cormorant Garamond', serif;
           font-style: italic;
           font-weight: 300;
           font-size: clamp(13px, 2.5vw, 16px);
           letter-spacing: 1.5px;
-          color: rgba(255, 185, 170, 0.7);
-          animation: intro-fade-up 0.8s ease both 0.75s;
-          transition: opacity 0.3s;
+          color: rgba(255, 185, 170, 0.85);
+          animation: tease-pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+          margin: 0;
+        }
+        @keyframes tease-pop {
+          0%   { opacity: 0; transform: translateY(8px) scale(0.94); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Lado derecho — decoración */
         .intro-right {
           display: none;
           position: relative;
@@ -311,11 +323,9 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
       `}</style>
 
       <div className="intro-root">
-        {/* Orbes */}
         <div className="intro-orb intro-orb-1" />
         <div className="intro-orb intro-orb-2" />
 
-        {/* Estrellas */}
         {mounted && starsRef.current.map((s, i) => (
           <div
             key={i}
@@ -333,9 +343,7 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
         ))}
 
         <div className="intro-inner">
-          {/* Izquierda */}
           <div className="intro-left">
-
             <h1 className="intro-title">¿Quieres ser<br />mi novia?</h1>
 
             <div className="intro-divider">
@@ -344,24 +352,41 @@ export default function IntroScreen({ onYes }: { onYes: () => void }) {
               <div className="intro-divider-line r" />
             </div>
 
-            <div className="intro-btns">
-              <button type="button" onPointerUp={onYes} className="btn-yes">
-                Sí ♥
-              </button>
-              <button
-                type="button"
-                onMouseEnter={advanceNoButton}
-                onClick={advanceNoButton}
-                className={`btn-no ${buttonOffsets[teaseLevel]}`}
-              >
-                {noLabels[teaseLevel]}
-              </button>
+            <div className="intro-btns-wrap">
+              <div className="intro-btns">
+                <button type="button" onPointerUp={onYes} className="btn-yes">
+                  Sí ♥
+                </button>
+
+                <div
+                  className={`btn-no-wrapper ${currentOffset} ${!noVisible ? 'hiding' : ''}`}
+                  style={{ transform: `scale(${currentScale})` }}
+                >
+                  <button
+                    type="button"
+                    onMouseEnter={advanceNoButton}
+                    onClick={advanceNoButton}
+                    className="btn-no"
+                    style={{
+                      fontSize: `${0.85 * currentScale + 0.1}rem`,
+                      padding: `${12 * currentScale + 2}px ${28 * currentScale + 4}px`,
+                    }}
+                  >
+                    {noLabels[teaseLevel] ?? noLabels[noLabels.length - 1]}
+                  </button>
+                </div>
+              </div>
             </div>
 
-            <p className="intro-tease">{playfulMessages[teaseLevel]}</p>
+            <div className="intro-tease-wrap">
+              {currentMessage && (
+                <p key={teaseKey} className="intro-tease">
+                  {currentMessage}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Derecha — decoración */}
           <div className="intro-right">
             <div className="intro-deco-ring intro-deco-ring-1" />
             <div className="intro-deco-ring intro-deco-ring-2" />
