@@ -15,9 +15,9 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
   experimental: {
-    turbopack: {
+    //turbopack: {
       // Configura el WebSocket HMR explícitamente
-      resolveAlias: {},
+      //resolveAlias: {},
     },
   },
 };
