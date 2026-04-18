@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Para ti, con mucho cariño',
-  description: 'Una sorpresa romántica hecha con cariño.',
+  title: 'With love for Adrii',
+  description: 'by devLAAT 🚀',
 }
 
 export default function RootLayout({
