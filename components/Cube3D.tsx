@@ -515,14 +515,6 @@ export default function Cube3D() {
           </div>
         </div>
 
-        {/* hint */}
-        {!hintGone && (
-          <div className={`c3d-hint ${hintHidden ? 'fade' : ''}`}>
-            <span className="c3d-hint-icon">✦</span>
-            arrastra libremente
-            <span className="c3d-hint-icon">✦</span>
-          </div>
-        )}
 
         {/* dots */}
         <div className="c3d-dots" aria-hidden>
