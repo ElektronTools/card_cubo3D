@@ -25,55 +25,66 @@ const getImageUrl = (src: string) =>
   `${src}?t=${new Date().toISOString().split('T')[0]}`
 
 /* ─────────────────────────────────────────────
-   FÍSICA
+   FÍSICA — constantes ajustadas
 ───────────────────────────────────────────── */
-const AUTO_SPEED       = 0.018   // °/ms en auto-rotación
-const DRAG_SENSITIVITY = 0.38   // sensibilidad al arrastrar
-const FRICTION         = 0.94   // fricción por frame
-const AUTO_RESUME_K    = 0.012  // qué tan rápido vuelve la auto-rotación
-const X_LIMIT          = 38     // ángulo máximo de inclinación vertical
-const MIN_VEL          = 0.008  // velocidad mínima antes de parar inercia
-const SPRING_X         = 0.035  // spring de retorno a X=0
-const TILT_FACTOR      = 0.6    // hover tilt desktop
+const AUTO_SPEED      = 0.016   // °/ms en auto-rotación
+const DRAG_SENSITIVITY = 0.40   // sensibilidad al arrastrar
+const FRICTION         = 0.935  // fricción por frame (más suave)
+const AUTO_RESUME_K    = 0.011  // recuperación de auto-rotación
+const MIN_VEL          = 0.005  // vel mínima antes de parar inercia
+const SPRING_X         = 0.028  // spring de retorno a X=0
+const TILT_FACTOR      = 6      // grados máx de hover tilt
+const GYRO_FACTOR      = 0.18   // sensibilidad giroscopio
 
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
-const lerp  = (a: number, b: number, t: number)   => a + (b - a) * t
+
+/* ─────────────────────────────────────────────
+   TIPOS
+───────────────────────────────────────────── */
+interface MoveRecord {
+  dx: number
+  dy: number
+  t: number
+}
 
 /* ─────────────────────────────────────────────
    COMPONENTE
 ───────────────────────────────────────────── */
 export default function Cube3D() {
-  const cubeRef    = useRef<HTMLDivElement>(null)
-  const wrapRef    = useRef<HTMLDivElement>(null)
-  const frameRef   = useRef<number | null>(null)
+  const cubeRef     = useRef<HTMLDivElement>(null)
+  const wrapRef     = useRef<HTMLDivElement>(null)
+  const frameRef    = useRef<number | null>(null)
 
   /* física */
-  const rotX       = useRef(-15)
-  const rotY       = useRef(0)
-  const velX       = useRef(0)
-  const velY       = useRef(0)
-  const autoVelY   = useRef(AUTO_SPEED * 16)
+  const rotX        = useRef(-12)
+  const rotY        = useRef(0)
+  const velX        = useRef(0)
+  const velY        = useRef(0)
+  const autoVelY    = useRef(AUTO_SPEED * 16)
 
   /* drag */
-  const dragging   = useRef(false)
-  const ptrId      = useRef<number | null>(null)
-  const lastPos    = useRef({ x: 0, y: 0 })
-  const lastDelta  = useRef({ x: 0, y: 0 })
-  const lastMoveT  = useRef(0)
-  const lastFrameT = useRef<number | null>(null)
+  const dragging    = useRef(false)
+  const ptrId       = useRef<number | null>(null)
+  const lastPos     = useRef({ x: 0, y: 0 })
+  const lastFrameT  = useRef<number | null>(null)
+  const moveHistory = useRef<MoveRecord[]>([])
 
   /* hover tilt */
-  const hoverTilt  = useRef({ x: 0, y: 0 })
-  const targetTilt = useRef({ x: 0, y: 0 })
+  const hoverTilt   = useRef({ x: 0, y: 0 })
+  const targetTilt  = useRef({ x: 0, y: 0 })
+
+  /* giroscopio */
+  const lastGyro    = useRef<{ beta: number; gamma: number } | null>(null)
 
   /* glow */
-  const glowRef    = useRef(0)
+  const glowRef     = useRef(0)
 
   /* UI */
-  const [isDragging, setIsDragging]   = useState(false)
-  const [activeFace, setActiveFace]   = useState(0)
-  const [hintGone, setHintGone]       = useState(false)
-  const [hintHidden, setHintHidden]   = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const [activeFace, setActiveFace] = useState(0)
+  const [hintGone, setHintGone]     = useState(false)
+  const [hintHidden, setHintHidden] = useState(false)
 
   /* ── aplicar transform al DOM sin re-render ── */
   const applyTransform = useCallback(() => {
@@ -97,34 +108,33 @@ export default function Cube3D() {
           Math.abs(velY.current) > MIN_VEL || Math.abs(velX.current) > MIN_VEL
 
         if (hasInertia) {
+          /* inercia libre — sin clamp en ningún eje */
           rotY.current += velY.current
           rotX.current -= velX.current
-          rotX.current  = clamp(rotX.current, -X_LIMIT, X_LIMIT)
           velY.current *= FRICTION
           velX.current *= FRICTION
           if (Math.abs(velY.current) < MIN_VEL) velY.current = 0
           if (Math.abs(velX.current) < MIN_VEL) velX.current = 0
         } else {
-          /* auto-rotación — velocidad se recupera suavemente */
+          /* auto-rotación suave */
           autoVelY.current = lerp(autoVelY.current, AUTO_SPEED * dt, AUTO_RESUME_K)
           rotY.current += autoVelY.current
-
-          /* spring retorno a X=0 */
+          /* spring suave de retorno a X=0 */
           rotX.current += -rotX.current * SPRING_X
         }
 
         /* hover tilt lerp */
-        hoverTilt.current.x = lerp(hoverTilt.current.x, targetTilt.current.x, 0.07)
-        hoverTilt.current.y = lerp(hoverTilt.current.y, targetTilt.current.y, 0.07)
+        hoverTilt.current.x = lerp(hoverTilt.current.x, targetTilt.current.x, 0.065)
+        hoverTilt.current.y = lerp(hoverTilt.current.y, targetTilt.current.y, 0.065)
       } else {
-        hoverTilt.current.x = lerp(hoverTilt.current.x, 0, 0.18)
-        hoverTilt.current.y = lerp(hoverTilt.current.y, 0, 0.18)
+        hoverTilt.current.x = lerp(hoverTilt.current.x, 0, 0.2)
+        hoverTilt.current.y = lerp(hoverTilt.current.y, 0, 0.2)
       }
 
-      /* glow en CSS var (sin setState) */
+      /* glow reactivo via CSS var */
       const speed = Math.abs(velY.current) + Math.abs(velX.current)
-      const targetGlow = dragging.current ? 1 : clamp(speed / 2.5, 0, 1)
-      glowRef.current  = lerp(glowRef.current, targetGlow, 0.09)
+      const targetGlow = dragging.current ? 1 : clamp(speed / 2.2, 0, 1)
+      glowRef.current = lerp(glowRef.current, targetGlow, 0.08)
       wrapRef.current?.style.setProperty('--glow', `${glowRef.current.toFixed(3)}`)
 
       applyTransform()
@@ -144,16 +154,57 @@ export default function Cube3D() {
     return () => clearInterval(id)
   }, [])
 
-  /* ── handlers ── */
+  /* ── giroscopio ── */
+  useEffect(() => {
+    const handleOrientation = (e: DeviceOrientationEvent) => {
+      if (e.beta == null || e.gamma == null) return
+      if (lastGyro.current === null) {
+        lastGyro.current = { beta: e.beta, gamma: e.gamma }
+        return
+      }
+      if (!dragging.current) {
+        const db = e.beta  - lastGyro.current.beta
+        const dg = e.gamma - lastGyro.current.gamma
+        rotX.current -= db * GYRO_FACTOR
+        rotY.current += dg * GYRO_FACTOR
+      }
+      lastGyro.current = { beta: e.beta, gamma: e.gamma }
+    }
+
+    /* iOS 13+ requiere permiso explícito */
+    type DOEWithPerm = typeof DeviceOrientationEvent & {
+      requestPermission?: () => Promise<'granted' | 'denied'>
+    }
+    const DOE = DeviceOrientationEvent as DOEWithPerm
+
+    if (typeof DOE.requestPermission === 'function') {
+      const askPermission = () => {
+        DOE.requestPermission!()
+          .then((state) => {
+            if (state === 'granted') {
+              window.addEventListener('deviceorientation', handleOrientation)
+            }
+          })
+          .catch(() => {/* el usuario denegó */})
+        wrapRef.current?.removeEventListener('click', askPermission)
+      }
+      wrapRef.current?.addEventListener('click', askPermission, { once: true })
+    } else if (window.DeviceOrientationEvent) {
+      window.addEventListener('deviceorientation', handleOrientation)
+    }
+
+    return () => window.removeEventListener('deviceorientation', handleOrientation)
+  }, [])
+
+  /* ── handlers de pointer ── */
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    ptrId.current     = e.pointerId
-    lastPos.current   = { x: e.clientX, y: e.clientY }
-    lastDelta.current = { x: 0, y: 0 }
-    dragging.current  = true
+    ptrId.current      = e.pointerId
+    lastPos.current    = { x: e.clientX, y: e.clientY }
+    dragging.current   = true
     velX.current = velY.current = 0
-    autoVelY.current  = 0
+    autoVelY.current   = 0
     lastFrameT.current = null
-    lastMoveT.current  = performance.now()
+    moveHistory.current = []
     setIsDragging(true)
     setHintHidden(true)
     setTimeout(() => setHintGone(true), 600)
@@ -164,11 +215,16 @@ export default function Cube3D() {
     if (!dragging.current || ptrId.current !== e.pointerId) return
     const dx = e.clientX - lastPos.current.x
     const dy = e.clientY - lastPos.current.y
-    lastPos.current   = { x: e.clientX, y: e.clientY }
-    lastDelta.current = { x: dx, y: dy }
-    lastMoveT.current = performance.now()
+    lastPos.current = { x: e.clientX, y: e.clientY }
+
+    /* rotación libre en ambos ejes — sin clamp */
     rotY.current += dx * DRAG_SENSITIVITY
-    rotX.current  = clamp(rotX.current - dy * DRAG_SENSITIVITY, -X_LIMIT, X_LIMIT)
+    rotX.current -= dy * DRAG_SENSITIVITY
+
+    /* guardar historial para lanzamiento ponderado */
+    moveHistory.current.push({ dx, dy, t: performance.now() })
+    if (moveHistory.current.length > 6) moveHistory.current.shift()
+
     applyTransform()
   }
 
@@ -177,13 +233,25 @@ export default function Cube3D() {
     if (e.currentTarget.hasPointerCapture(e.pointerId))
       e.currentTarget.releasePointerCapture(e.pointerId)
 
-    if (performance.now() - lastMoveT.current < 100) {
-      velY.current = lastDelta.current.x * DRAG_SENSITIVITY * 0.55
-      velX.current = lastDelta.current.y * DRAG_SENSITIVITY * 0.55
+    /* velocidad de lanzamiento con promedio ponderado de los últimos frames */
+    const now = performance.now()
+    const recent = moveHistory.current.filter((m) => now - m.t < 90)
+    if (recent.length > 0) {
+      let wx = 0, wy = 0, wt = 0
+      recent.forEach((m, i) => {
+        const w = i + 1
+        wx += m.dx * w
+        wy += m.dy * w
+        wt += w
+      })
+      velY.current = (wx / wt) * DRAG_SENSITIVITY * 0.52
+      velX.current = (wy / wt) * DRAG_SENSITIVITY * 0.52
     }
-    ptrId.current = null
-    dragging.current  = false
+
+    ptrId.current      = null
+    dragging.current   = false
     lastFrameT.current = null
+    moveHistory.current = []
     setIsDragging(false)
   }
 
@@ -193,8 +261,8 @@ export default function Cube3D() {
     const nx = (e.clientX - r.left  - r.width  / 2) / (r.width  / 2)
     const ny = (e.clientY - r.top   - r.height / 2) / (r.height / 2)
     targetTilt.current = {
-      x: -ny * X_LIMIT * TILT_FACTOR * 0.18,
-      y:  nx * X_LIMIT * TILT_FACTOR * 0.18,
+      x: -ny * TILT_FACTOR,
+      y:  nx * TILT_FACTOR,
     }
   }
 
@@ -240,8 +308,8 @@ export default function Cube3D() {
         .c3d-wrap {
           position: relative;
           width: 220px; height: 220px;
-          perspective: 860px;
-          perspective-origin: 50% 42%;
+          perspective: 900px;
+          perspective-origin: 50% 44%;
           cursor: grab;
           touch-action: none;
           user-select: none;
@@ -259,10 +327,10 @@ export default function Cube3D() {
           border-radius: 50%;
           pointer-events: none;
           z-index: 20;
-          border: 1.5px solid rgba(var(--gc), calc(var(--glow) * 0.5));
+          border: 1.5px solid rgba(var(--gc), calc(var(--glow) * 0.55));
           box-shadow:
-            0 0 calc(var(--glow) * 44px) rgba(var(--gc), calc(var(--glow) * 0.22)),
-            inset 0 0 calc(var(--glow) * 18px) rgba(var(--gc), calc(var(--glow) * 0.1));
+            0 0 calc(var(--glow) * 50px) rgba(var(--gc), calc(var(--glow) * 0.25)),
+            inset 0 0 calc(var(--glow) * 20px) rgba(var(--gc), calc(var(--glow) * 0.12));
         }
 
         /* partículas flotantes */
@@ -451,7 +519,7 @@ export default function Cube3D() {
         {!hintGone && (
           <div className={`c3d-hint ${hintHidden ? 'fade' : ''}`}>
             <span className="c3d-hint-icon">✦</span>
-            arrastra para girar
+            arrastra libremente
             <span className="c3d-hint-icon">✦</span>
           </div>
         )}
