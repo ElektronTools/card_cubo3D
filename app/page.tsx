@@ -1,39 +1,52 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import AcceptScreen from '@/components/AcceptScreen'
 import GiftScreen from '@/components/GiftScreen'
 import IntroScreen from '@/components/IntroScreen'
+import SplashScreen from '@/components/SplashScreen'
+
+// ─── Tipos que GiftScreen espera ─────────────────────────────────────────────
+// Memory debe tener: title, description, accent, emoji
+// promises debe ser: string[]
 
 const memories = [
   {
-    title: 'Tu sonrisa favorita',
-    description: 'La que me desarma en segundos y me arregla cualquier dia sin pedir permiso.',
-    accent: 'from-rose-300 via-pink-200 to-orange-100',
+    title: 'La primera vez',
+    description: 'Cuando te vi por primera vez y supe que eras especial…',
+    accent: '#e07090',
     emoji: '✨',
   },
   {
-    title: 'Nuestra vibra',
-    description: 'Esa forma tan bonita de reir, hablar y sentir que todo se vuelve mas ligero contigo.',
-    accent: 'from-fuchsia-300 via-pink-200 to-amber-100',
-    emoji: '💞',
+    title: 'Nuestra risa',
+    description: 'Ese día que nos reímos sin parar de nada y de todo…',
+    accent: '#b060d0',
+    emoji: '🌸',
   },
   {
-    title: 'Lo que imagino',
-    description: 'Mas canciones, mas abrazos, mas salidas sencillas y mas recuerdos que solo tengan sentido para nosotros.',
-    accent: 'from-orange-200 via-rose-100 to-pink-200',
-    emoji: '🌙',
+    title: 'Lo que sentí',
+    description: 'El momento exacto en que supe que te quería de verdad.',
+    accent: '#d94f7a',
+    emoji: '💖',
   },
 ]
 
-const promises = [
-  'Escucharte con calma, incluso en los dias raros.',
-  'Hacerte sentir querida en los detalles pequenos.',
-  'Seguir buscando formas nuevas de sacarte una sonrisa.',
-  'Cuidar lo nuestro con ternura, paciencia y verdad.',
+const promises: string[] = [
+  'Siempre estar contigo cuando me necesites.',
+  'Hacerte reír todos los días sin excepción.',
+  'Cuidarte con todo lo que tengo y soy.',
 ]
+// ─────────────────────────────────────────────────────────────────────────────
+
+const HEARTS = Array.from({ length: 18 }, (_, i) => ({
+  left: `${(i * 17) % 100}%`,
+  delay: `${i * 0.45}s`,
+  duration: `${10 + (i % 5)}s`,
+  symbol: i % 3 === 0 ? '❤' : i % 3 === 1 ? '✦' : '❀',
+}))
 
 export default function Page() {
+  const [splashDone, setSplashDone] = useState(false)
   const [stage, setStage] = useState<'intro' | 'accepted' | 'gift'>('intro')
   const audioRef = useRef<HTMLAudioElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -41,122 +54,113 @@ export default function Page() {
   const [currentTime, setCurrentTime] = useState(0)
   const [autoplayBlocked, setAutoplayBlocked] = useState(false)
 
+  // ── Audio: metadata y eventos ────────────────────────────────────────────
   useEffect(() => {
     const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
-
+    if (!audio) return
     const syncMetadata = () => setDuration(audio.duration || 0)
-    const syncTime = () => setCurrentTime(audio.currentTime)
-    const handleEnded = () => setIsPlaying(false)
-
+    const syncTime     = () => setCurrentTime(audio.currentTime)
+    const handleEnded  = () => setIsPlaying(false)
     audio.addEventListener('loadedmetadata', syncMetadata)
-    audio.addEventListener('timeupdate', syncTime)
-    audio.addEventListener('ended', handleEnded)
-
+    audio.addEventListener('timeupdate',     syncTime)
+    audio.addEventListener('ended',          handleEnded)
     return () => {
       audio.removeEventListener('loadedmetadata', syncMetadata)
-      audio.removeEventListener('timeupdate', syncTime)
-      audio.removeEventListener('ended', handleEnded)
+      audio.removeEventListener('timeupdate',     syncTime)
+      audio.removeEventListener('ended',          handleEnded)
     }
   }, [])
 
+  // ── Autoplay + desbloqueo en primer toque ────────────────────────────────
   useEffect(() => {
     const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
-
-    const tryAutoplay = async () => {
+    if (!audio) return
+    let unlocked = false
+    const tryPlay = async () => {
+      if (unlocked) return
       try {
         await audio.play()
+        unlocked = true
         setIsPlaying(true)
         setAutoplayBlocked(false)
+        window.removeEventListener('pointerdown', tryPlay)
+        window.removeEventListener('keydown',     tryPlay)
       } catch {
-        setIsPlaying(false)
         setAutoplayBlocked(true)
       }
     }
-
-    const unlockAudio = () => {
-      void tryAutoplay()
-    }
-
-    void tryAutoplay()
-
-    window.addEventListener('pointerdown', unlockAudio, { passive: true })
-    window.addEventListener('touchstart', unlockAudio, { passive: true })
-    window.addEventListener('keydown', unlockAudio)
-
+    void tryPlay()
+    window.addEventListener('pointerdown', tryPlay, { passive: true })
+    window.addEventListener('keydown',     tryPlay)
     return () => {
-      window.removeEventListener('pointerdown', unlockAudio)
-      window.removeEventListener('touchstart', unlockAudio)
-      window.removeEventListener('keydown', unlockAudio)
+      window.removeEventListener('pointerdown', tryPlay)
+      window.removeEventListener('keydown',     tryPlay)
     }
   }, [])
 
-  const togglePlayback = async () => {
+  const togglePlayback = useCallback(async () => {
     const audio = audioRef.current
-
-    if (!audio) {
-      return
-    }
-
+    if (!audio) return
     if (audio.paused) {
       try {
         await audio.play()
         setIsPlaying(true)
         setAutoplayBlocked(false)
       } catch {
-        setIsPlaying(false)
         setAutoplayBlocked(true)
       }
-
-      return
+    } else {
+      audio.pause()
+      setIsPlaying(false)
     }
+  }, [])
 
-    audio.pause()
-    setIsPlaying(false)
-  }
-
-  const seekPlayback = (nextTime: number) => {
+  const seekPlayback = useCallback((nextTime: number) => {
     const audio = audioRef.current
-
     setCurrentTime(nextTime)
+    if (audio) audio.currentTime = nextTime
+  }, [])
 
-    if (audio) {
-      audio.currentTime = nextTime
-    }
-  }
+  // ── onDone estable para SplashScreen ────────────────────────────────────
+  const handleSplashDone = useCallback(() => setSplashDone(true), [])
 
   return (
     <main className="relative min-h-[100dvh] overflow-hidden bg-[url('/img/fondo.jpeg')] bg-cover bg-center bg-fixed text-slate-900">
+
+      {/* Audio global */}
       <audio ref={audioRef} preload="auto" src="/music/risa.mp3" />
 
+      {/* Splash encima de todo — no bloquea el render del contenido */}
+      {!splashDone && <SplashScreen onDone={handleSplashDone} />}
+
+      {/* Corazones flotantes decorativos */}
       <div className="pointer-events-none absolute inset-0 opacity-80">
-        {Array.from({ length: 18 }).map((_, index) => (
+        {HEARTS.map((h, i) => (
           <span
-            key={index}
+            key={i}
             className="floating-heart absolute text-xl text-rose-300/70"
             style={{
-              left: `${(index * 17) % 100}%`,
-              animationDelay: `${index * 0.45}s`,
-              animationDuration: `${10 + (index % 5)}s`,
+              left:              h.left,
+              animationDelay:    h.delay,
+              animationDuration: h.duration,
             }}
           >
-            {index % 3 === 0 ? '❤' : index % 3 === 1 ? '✦' : '❀'}
+            {h.symbol}
           </span>
         ))}
       </div>
 
+      {/* Overlay de luz */}
       <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.35),transparent_40%,rgba(255,255,255,0.18))]" />
 
+      {/* Contenido — SIEMPRE renderizado; el splash va encima con z-index */}
       <section className="relative z-10 flex min-h-[100dvh] items-center justify-center px-3 py-6 sm:px-6 sm:py-10">
-        {stage === 'intro' && <IntroScreen onYes={() => setStage('accepted')} />}
-        {stage === 'accepted' && <AcceptScreen onNext={() => setStage('gift')} />}
+        {stage === 'intro' && (
+          <IntroScreen onYes={() => setStage('accepted')} />
+        )}
+        {stage === 'accepted' && (
+          <AcceptScreen onNext={() => setStage('gift')} />
+        )}
         {stage === 'gift' && (
           <GiftScreen
             autoplayBlocked={autoplayBlocked}
